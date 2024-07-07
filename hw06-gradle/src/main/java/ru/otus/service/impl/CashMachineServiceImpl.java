@@ -1,79 +1,57 @@
 package ru.otus.service.impl;
 
-import ru.otus.entities.notes.*;
+import ru.otus.entities.machine.MoneyBox;
+import ru.otus.entities.notes.Notes;
 import ru.otus.service.api.CashMachineService;
-import  ru.otus.service.api.MoneyBoxService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CashMachineServiceImpl implements CashMachineService {
-    private final MoneyBoxService moneyBoxService;
 
-    public CashMachineServiceImpl(MoneyBoxService moneyBoxService) {
-        this.moneyBoxService = moneyBoxService;
+    private final MoneyBox moneyBox;
+
+    public CashMachineServiceImpl(MoneyBox moneyBox) {
+        this.moneyBox = moneyBox;
     }
 
     @Override
-    public void putMoney(List<AbstractNote> listOfNotes) {
-        if (listOfNotes == null)
-            throw new IllegalStateException("List of notes is null");
-        moneyBoxService.putNotes(listOfNotes);
+    public void putMoney(int note100, int note500, int note1000, int note5000) {
+        if (note100 < 0 || note500<0 || note1000<0 || note5000<0)
+        {
+            throw new IllegalArgumentException("You can't put negative amount of notes");
+        }
+        moneyBox.setNote100(moneyBox.getNote100()+note100);
+        moneyBox.setNote500(moneyBox.getNote500()+note500);
+        moneyBox.setNote1000(moneyBox.getNote1000()+note1000);
+        moneyBox.setNote5000(moneyBox.getNote5000()+note5000);
     }
 
     @Override
-    public void getMoney(int sum) {
-        if (moneyBoxService == null)
-            throw new IllegalStateException("Money box is null");
+    public Map<String, Integer> getMoney(int sum) {
         if (sum < 0)
+        {
             throw new IllegalArgumentException("sum can't be negative");
-        if (sum % 100 != 0)
-            throw new IllegalArgumentException("Not supported sum");
-        if (moneyBoxService.getBalance() < sum)
-            throw new IllegalArgumentException("Not enough money in money box");
-
-        List<AbstractNote> listOfNotes = new ArrayList<>();
-        sum = add5000Note(sum, listOfNotes);
-        sum = add1000Note(sum, listOfNotes);
-        sum = add500Note(sum, listOfNotes);
-        add100Note(sum, listOfNotes);
-        moneyBoxService.getNotes(listOfNotes);
+        }
+        Map<String, Integer> result = new HashMap<>();
+        for(var note: Notes.values())
+        {
+            while (sum-note.getValue()>=0)
+            {
+                sum-=note.getValue();
+                result.put(note.name(), result.get(note.name()) != null ? result.get(note.name())+1 : 1);
+            }
+        }
+        if (sum > 0)
+        {
+            throw new IllegalArgumentException("Not enough money");
+        }
+        return result;
     }
 
     @Override
     public int checkBalance() {
-        return this.moneyBoxService.getBalance();
-    }
-
-    private int add5000Note(int sum, List<AbstractNote> listOfNotes) {
-        while (sum - 5000 >= 0) {
-            listOfNotes.add(new Note5000());
-            sum = sum - 5000;
-        }
-        return sum;
-    }
-
-    private int add1000Note(int sum, List<AbstractNote> listOfNotes) {
-        while (sum - 1000 >= 0) {
-            listOfNotes.add(new Note1000());
-            sum = sum - 1000;
-        }
-        return sum;
-    }
-
-    private int add500Note(int sum, List<AbstractNote> listOfNotes) {
-        while (sum - 500 >= 0) {
-            listOfNotes.add(new Note500());
-            sum = sum - 500;
-        }
-        return sum;
-    }
-
-    private int add100Note(int sum, List<AbstractNote> listOfNotes) {
-        while (sum - 100 >= 0) {
-            listOfNotes.add(new Note100());
-            sum = sum - 100;
-        }
-        return sum;
+        return moneyBox.getNote100()*Notes.NOTE_100.getValue()+ moneyBox.getNote500()*Notes.NOTE_500.getValue()+
+                moneyBox.getNote1000()*Notes.NOTE_1000.getValue()+ moneyBox.getNote5000()*Notes.NOTE_5000.getValue();
     }
 }

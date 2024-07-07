@@ -1,14 +1,11 @@
 package ru.otus.service.api;
 
-
-import  ru.otus.entities.notes.AbstractNote;
-
-import java.util.List;
+import java.util.Map;
 
 public interface CashMachineService {
-    void putMoney(List<AbstractNote> listOfNotes);
+    void putMoney(int note100, int note500, int note1000, int note5000);
 
-    void getMoney(int sum);
+    Map<String, Integer> getMoney(int sum);
 
     int checkBalance();
 }

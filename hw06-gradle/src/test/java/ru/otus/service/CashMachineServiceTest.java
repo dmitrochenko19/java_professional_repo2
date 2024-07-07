@@ -1,81 +1,60 @@
 package ru.otus.service;
 
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import ru.otus.entities.notes.*;
+import ru.otus.entities.machine.MoneyBox;
+import ru.otus.entities.notes.Notes;
 import ru.otus.service.api.CashMachineService;
-import ru.otus.service.api.MoneyBoxService;
 import ru.otus.service.impl.CashMachineServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
-
+import static org.mockito.Mockito.mock;
 
 public class CashMachineServiceTest {
-    @Mock
-    MoneyBoxService moneyBoxService = mock(MoneyBoxService.class);
-
-    CashMachineService cashMachineService = new CashMachineServiceImpl(moneyBoxService);
-
     @Test
-    public void putMoneyTest1() {
-        List<AbstractNote> listOfNotes = new ArrayList<>(List.of(new Note5000(), new Note1000(), new Note500(), new Note100()));
-        ArgumentCaptor<List<AbstractNote>> listOfNotesCaptor = ArgumentCaptor.forClass(List.class);
-        cashMachineService.putMoney(listOfNotes);
-        verify(moneyBoxService, times(1)).putNotes(listOfNotesCaptor.capture());
-        assertEquals(listOfNotes, listOfNotesCaptor.getValue());
+    public void putMoneyTest()
+    {
+        MoneyBox moneyBox = new MoneyBox(2,3,2,1);
+        CashMachineService cashMachineService = new CashMachineServiceImpl(moneyBox);
+        cashMachineService.putMoney(1,1,1,2);
+        Assertions.assertEquals(moneyBox.getNote100(), 2);
+        Assertions.assertEquals(moneyBox.getNote500(), 3);
+        Assertions.assertEquals(moneyBox.getNote1000(), 4);
+        Assertions.assertEquals(moneyBox.getNote5000(), 4);
     }
 
     @Test
-    public void getMoneyTest1() {
-        ArgumentCaptor<List<AbstractNote>> listOfNotesCaptor = ArgumentCaptor.forClass(List.class);
-        doNothing().when(moneyBoxService).getNotes(listOfNotesCaptor.capture());
-        when(moneyBoxService.getBalance()).thenReturn(6600);
-        cashMachineService.getMoney(6600);
-        List<AbstractNote> expected = new ArrayList<>(List.of(new Note5000(), new Note1000(), new Note500(), new Note100()));
-        assertEquals(expected, listOfNotesCaptor.getValue());
+    public void putMoneyNegativeTest()
+    {
+        MoneyBox moneyBox =mock(MoneyBox.class);
+        CashMachineService cashMachineService = new CashMachineServiceImpl(moneyBox);
+        Throwable exp = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> cashMachineService.putMoney(-1, 1, 1, -2));
+        Assertions.assertEquals(exp.getMessage(), "You can't put negative amount of notes");
     }
 
     @Test
-    public void getMoneyTest2() {
-        ArgumentCaptor<List<AbstractNote>> listOfNotesCaptor = ArgumentCaptor.forClass(List.class);
-        doNothing().when(moneyBoxService).getNotes(listOfNotesCaptor.capture());
-        when(moneyBoxService.getBalance()).thenReturn(100000);
-        cashMachineService.getMoney(11700);
-        List<AbstractNote> expected = new ArrayList<>(List.of(new Note5000(), new Note5000(), new Note1000(), new Note500(), new Note100(), new Note100()));
-        assertEquals(expected, listOfNotesCaptor.getValue());
-    }
+    public void getMoneyTest()
+    {
+        MoneyBox moneyBox = new MoneyBox(2,3,2,1);
+        CashMachineService cashMachineService = new CashMachineServiceImpl(moneyBox);
+        Map<String, Integer> actual = cashMachineService.getMoney(6600);
 
-    @Test
-    public void getMoneyTest3() {
-        when(moneyBoxService.getBalance()).thenReturn(5000);
-        assertThrows(IllegalArgumentException.class, () -> cashMachineService.getMoney(11700));
-    }
+        Map<String, Integer> expected = new HashMap<>();
+        expected.put(Notes.NOTE_5000.name(), 1);
+        expected.put(Notes.NOTE_1000.name(), 1);
+        expected.put(Notes.NOTE_500.name(),1);
+        expected.put(Notes.NOTE_100.name(), 1);
 
-    @Test
-    public void getMoneyTest4() {
-        when(moneyBoxService.getBalance()).thenReturn(5000);
-        assertThrows(IllegalArgumentException.class, () -> cashMachineService.getMoney(1050));
-    }
-
-    @Test
-    public void getMoneyTest5() {
-        when(moneyBoxService.getBalance()).thenReturn(5000);
-        assertThrows(IllegalArgumentException.class, () -> cashMachineService.getMoney(-1050));
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     public void checkBalanceTest() {
-        when(moneyBoxService.getBalance()).thenReturn(500);
-        int result = cashMachineService.checkBalance();
-        verify(moneyBoxService, times(1)).getBalance();
-        assertEquals(500, result);
+        MoneyBox moneyBox = new MoneyBox(2,3,2,1);
+        CashMachineService cashMachineService = new CashMachineServiceImpl(moneyBox);
+        Assertions.assertEquals(14100, cashMachineService.checkBalance());
     }
 }
