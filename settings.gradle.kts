@@ -1,6 +1,7 @@
 rootProject.name = "java_repo2"
 include("hw01-gradle")
 include("hw06-atm")
+include("hw07-patterns")
 include("hw08-io")
 
 pluginManagement {
