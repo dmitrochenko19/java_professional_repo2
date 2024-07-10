@@ -1,5 +1,6 @@
 rootProject.name = "java_repo2"
 include("hw01-gradle")
+include("hw06-atm")
 
 pluginManagement {
     val jgitver: String by settings
@@ -22,4 +23,3 @@ pluginManagement {
         id("com.diffplug.spotless") version spotless
     }
 }
-include("hw06-gradle")
