@@ -12,10 +12,10 @@ public class ProcessorAggregator implements Processor {
     public Map<String, Double> process(List<Measurement> data) {
         // группирует выходящий список по name, при этом суммирует поля value
         Map<String, Double> map = new TreeMap<>();
-        for (Measurement measurement : data) {
+        data.forEach(measurement -> {
             Double currentValue = map.get(measurement.name());
             map.put(measurement.name(), currentValue != null ? currentValue + measurement.value() : measurement.value());
-        }
+        });
         return map;
     }
 }

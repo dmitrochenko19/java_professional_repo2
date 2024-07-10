@@ -13,6 +13,7 @@ import ru.otus.model.Measurement;
 public class ResourcesFileLoader implements Loader {
 
     private final String fileName;
+    private static final  Gson gson = new Gson();
 
     public ResourcesFileLoader(String fileName) {
         this.fileName = fileName;
@@ -23,7 +24,6 @@ public class ResourcesFileLoader implements Loader {
         // читает файл
         String dataAsStr = readAsString();
         //парсинг
-        Gson gson = new Gson();
         Type listType = new TypeToken<List<Measurement>>() {}.getType();
         return gson.fromJson(dataAsStr, listType);
     }
