@@ -11,16 +11,13 @@ public class HistoryListener implements Listener, HistoryReader {
 
     private final Map<Long, Message> historyHolder = new HashMap<>();
 
-    private long count = 1;
-
     @Override
     public void onUpdated(Message msg) {
-        historyHolder.put(count, msg);
-        count++;
+        historyHolder.put(msg.getId(), msg.toBuilder().build());
     }
 
     @Override
     public Optional<Message> findMessageById(long id) {
-        return Optional.of(historyHolder.get(id));
+        return Optional.ofNullable(historyHolder.get(id));
     }
 }

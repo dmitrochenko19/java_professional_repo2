@@ -11,13 +11,14 @@ public class ThrowExceptionProcessorTest {
     @Test
     @DisplayName("Тестируем процессор, который выбрасывает исключение в чётную секунду")
     void handleProcessorsTest() {
-        ThrowExceptionProcessor exceptionProcessor = Mockito.spy(new ThrowExceptionProcessor());
+        TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+        ThrowExceptionProcessor exceptionProcessor = new ThrowExceptionProcessor(timeProvider);
         var message = new Message.Builder(1L).field7("field7").build();
 
-        Mockito.doReturn(2).when(exceptionProcessor).getSecond();
+        Mockito.when(timeProvider.getSecond()).thenReturn(2);
         Assertions.assertThrows(RuntimeException.class, () -> exceptionProcessor.process(message));
 
-        Mockito.doReturn(3).when(exceptionProcessor).getSecond();
+        Mockito.when(timeProvider.getSecond()).thenReturn(3);
         Assertions.assertEquals(message, exceptionProcessor.process(message));
     }
 }

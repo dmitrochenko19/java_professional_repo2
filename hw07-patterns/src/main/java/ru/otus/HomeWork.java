@@ -31,7 +31,8 @@ public class HomeWork {
           по аналогии с Demo.class
           из элеменов "to do" создать new ComplexProcessor и обработать сообщение
         */
-        var processors = List.of(new ProcessorChangeFields(), new ThrowExceptionProcessor());
+        TimeProvider timeProvider = new TimeProviderImpl();
+        var processors = List.of(new ProcessorChangeFields(), new ThrowExceptionProcessor(timeProvider));
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {
         });
