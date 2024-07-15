@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import ru.otus.core.repository.DataTemplate;
+import ru.otus.core.repository.DataTemplateException;
 import ru.otus.core.repository.executor.DbExecutor;
 
 /**
@@ -37,7 +38,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     return null;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DataTemplateException(e);
             }
         });
     }
@@ -51,7 +52,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     res.add(createObject(resultSet));
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DataTemplateException(e);
             }
             return res;
         }).orElse(null);
@@ -66,7 +67,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 params.add(field.get(client));
             }
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataTemplateException(e);
         }
         return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(), params);
     }
@@ -83,7 +84,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             id.setAccessible(true);
             params.add(id.get(client));
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataTemplateException(e);
         }
         dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(), params);
     }
@@ -97,7 +98,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             }
             return object;
         } catch (SQLException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new RuntimeException(e);
+            throw new DataTemplateException(e);
         }
     }
 }

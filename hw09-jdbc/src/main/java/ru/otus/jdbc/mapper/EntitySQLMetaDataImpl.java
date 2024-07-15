@@ -7,48 +7,62 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
 
     private final EntityClassMetaData<?> entityClassMetaData;
 
+    private static final String SELECT_ALL_QUERY = "select * from %s";
+    private static final String SELECT_BY_ID_QUERY = "select * from %s where %s = ?";
+    private static final String INSERT_INTO_PART = "insert into %s ";
+    private static final String UPDATE_QUERY_PART = "update";
+    private static final String SET_QUERY_PART = "set";
+    private static final String VALUES_PART = "values";
+    private static final String OPEN_BRACKET = "(";
+    private static final String CLOSE_BRACKET = ")";
+    private static final String EMPTY_SPACE = " ";
+    private static final String QUESTION = "?";
+    private static final String EQUALS = " = ";
+    private static final String WHERE_PART = "where";
+    private static final String COMMA = ",";
+
     public EntitySQLMetaDataImpl(EntityClassMetaData<?> entityClassMetaData) {
         this.entityClassMetaData = entityClassMetaData;
     }
 
     @Override
     public String getSelectAllSql() {
-        return "select * from %s".formatted(entityClassMetaData.getName());
+        return SELECT_ALL_QUERY.formatted(entityClassMetaData.getName());
     }
 
     @Override
     public String getSelectByIdSql() {
-        return "select * from %s where %s = ?".formatted(
-                entityClassMetaData.getName(), entityClassMetaData.getIdField().getName());
+        return SELECT_BY_ID_QUERY.formatted(entityClassMetaData.getName(), entityClassMetaData.getIdField().getName());
     }
 
     @Override
     public String getInsertSql() {
         List<Field> fields = entityClassMetaData.getFieldsWithoutId();
-        StringBuilder stringBuilder = new StringBuilder("insert into %s ".formatted(entityClassMetaData.getName()));
-        StringBuilder stringBuilder1 = new StringBuilder("values (");
-        stringBuilder.append("(");
+        StringBuilder stringBuilder = new StringBuilder(INSERT_INTO_PART.formatted(entityClassMetaData.getName()));
+        StringBuilder stringBuilder1 = new StringBuilder(VALUES_PART).append(EMPTY_SPACE).append(OPEN_BRACKET);
+        stringBuilder.append(OPEN_BRACKET);
         for (Field field : fields) {
-            stringBuilder.append(field.getName()).append(",");
-            stringBuilder1.append("?,");
+            stringBuilder.append(field.getName()).append(COMMA);
+            stringBuilder1.append(QUESTION).append(COMMA);
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         stringBuilder1.deleteCharAt(stringBuilder1.length() - 1);
-        stringBuilder.append(") ");
-        stringBuilder1.append(")");
+        stringBuilder.append(CLOSE_BRACKET).append(EMPTY_SPACE);
+        stringBuilder1.append(CLOSE_BRACKET);
         stringBuilder.append(stringBuilder1);
         return stringBuilder.toString();
     }
 
     @Override
     public String getUpdateSql() {
-        StringBuilder stringBuilder = new StringBuilder("update ").append(entityClassMetaData.getName()).append(" set ");
+        StringBuilder stringBuilder = new StringBuilder(UPDATE_QUERY_PART).append(EMPTY_SPACE).append(entityClassMetaData.getName()).append(EMPTY_SPACE).append(SET_QUERY_PART).append(EMPTY_SPACE);
         List<Field> fields = entityClassMetaData.getFieldsWithoutId();
         for (Field field : fields) {
-            stringBuilder.append(field.getName()).append(" = ").append("?,");
+            stringBuilder.append(field.getName()).append(EQUALS).append(QUESTION).append(COMMA);
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        stringBuilder.append(" where ").append(entityClassMetaData.getIdField().getName()).append(" = ?");
+        stringBuilder.append(EMPTY_SPACE).append(WHERE_PART).append(EMPTY_SPACE)
+                .append(entityClassMetaData.getIdField().getName()).append(EQUALS).append(QUESTION);
         return stringBuilder.toString();
     }
 }
