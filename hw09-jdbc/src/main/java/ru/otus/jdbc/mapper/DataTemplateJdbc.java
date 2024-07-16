@@ -6,7 +6,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import ru.otus.core.repository.DataTemplate;
 import ru.otus.core.repository.DataTemplateException;
@@ -30,7 +29,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public Optional<T> findById(Connection connection, long id) {
-        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), (Function<ResultSet, Object>) resultSet -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), resultSet -> {
             try {
                 if (resultSet.next()) {
                     return createObject(resultSet);
@@ -45,7 +44,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public List<T> findAll(Connection connection) {
-        return (List<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), List.of(), (Function<ResultSet, Object>) resultSet -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), List.of(), resultSet -> {
             List<T> res = new ArrayList<>();
             try {
                 while (resultSet.next()) {
@@ -55,7 +54,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 throw new DataTemplateException(e);
             }
             return res;
-        }).orElse(null);
+        }).orElseThrow(() -> new RuntimeException("error"));
     }
 
     @Override
