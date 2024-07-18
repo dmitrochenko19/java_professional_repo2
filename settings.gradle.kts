@@ -26,3 +26,4 @@ pluginManagement {
     }
 }
 include("hw09-jdbc")
+include("hw10-jpql")
