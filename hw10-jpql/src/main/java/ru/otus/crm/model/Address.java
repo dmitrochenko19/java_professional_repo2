@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "address")
-public class Address {
+public class Address implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,5 +28,12 @@ public class Address {
     public Address(Long id, String street) {
         this.id = id;
         this.street = street;
+    }
+
+    @Override
+    protected Address clone() throws CloneNotSupportedException {
+        Address address = new Address(this.id, this.street);
+        address.setClient(this.getClient());
+        return address;
     }
 }

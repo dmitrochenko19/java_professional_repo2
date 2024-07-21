@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "phone")
-public class Phone {
+public class Phone implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,5 +25,12 @@ public class Phone {
     public Phone(Long id, String number) {
         this.id = id;
         this.number = number;
+    }
+
+    @Override
+    protected Phone clone() throws CloneNotSupportedException {
+        Phone phone =  new Phone(this.id, this.number);
+        phone.setClient(this.client);
+        return phone;
     }
 }

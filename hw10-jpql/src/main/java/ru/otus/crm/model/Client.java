@@ -52,11 +52,26 @@ public class Client implements Cloneable {
     @SuppressWarnings({"java:S2975", "java:S1182"})
     public Client clone() {
         Client client = new Client(this.id, this.name);
-        client.phones = this.phones;
-        phones.forEach(phone -> phone.setClient(client));
-        client.address = this.address;
-        address.setClient(client);
+        try {
+            client.phones = getClonedPhones();
+            client.phones.forEach(phone -> phone.setClient(client));
+            client.address = this.address.clone();
+            client.address.setClient(client);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
         return client;
+    }
+
+    private List<Phone> getClonedPhones()
+    {
+        return this.phones.stream().map(phone -> {
+            try {
+                return phone.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
     }
 
     @Override
