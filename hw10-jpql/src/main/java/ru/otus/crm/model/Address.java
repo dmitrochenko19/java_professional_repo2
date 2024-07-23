@@ -33,7 +33,6 @@ public class Address implements Cloneable {
     @Override
     protected Address clone() throws CloneNotSupportedException {
         Address address = new Address(this.id, this.street);
-        address.setClient(this.getClient());
         return address;
     }
 }

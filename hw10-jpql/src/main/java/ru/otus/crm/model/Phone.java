@@ -30,7 +30,6 @@ public class Phone implements Cloneable {
     @Override
     protected Phone clone() throws CloneNotSupportedException {
         Phone phone =  new Phone(this.id, this.number);
-        phone.setClient(this.client);
         return phone;
     }
 }
