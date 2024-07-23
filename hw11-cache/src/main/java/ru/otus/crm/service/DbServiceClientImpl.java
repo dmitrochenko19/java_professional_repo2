@@ -2,6 +2,8 @@ package ru.otus.crm.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.cachehw.HwCache;
+import ru.otus.cachehw.MyCache;
 import ru.otus.core.repository.DataTemplate;
 import ru.otus.core.sessionmanager.TransactionRunner;
 import ru.otus.crm.model.Client;
@@ -14,6 +16,7 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     private final DataTemplate<Client> dataTemplate;
     private final TransactionRunner transactionRunner;
+    private final HwCache<Long, Client> cache = new MyCache<>();
 
     public DbServiceClientImpl(TransactionRunner transactionRunner, DataTemplate<Client> dataTemplate) {
         this.transactionRunner = transactionRunner;
@@ -22,7 +25,7 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     @Override
     public Client saveClient(Client client) {
-        return transactionRunner.doInTransaction(connection -> {
+        Client savedClient = transactionRunner.doInTransaction(connection -> {
             if (client.getId() == null) {
                 var clientId = dataTemplate.insert(connection, client);
                 var createdClient = new Client(clientId, client.getName());
@@ -33,15 +36,24 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("updated client: {}", client);
             return client;
         });
+        cache.put(savedClient.getId(), savedClient);
+        return savedClient;
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        return transactionRunner.doInTransaction(connection -> {
-            var clientOptional = dataTemplate.findById(connection, id);
-            log.info("client: {}", clientOptional);
-            return clientOptional;
-        });
+        Client client = cache.get(id);
+        if (client == null) {
+            client = transactionRunner.doInTransaction(connection -> {
+                var clientOptional = dataTemplate.findById(connection, id);
+                log.info("client: {}", clientOptional);
+                return clientOptional;
+            }).orElse(null);
+            if (client != null) {
+                cache.put(client.getId(), client);
+            }
+        }
+        return Optional.ofNullable(client);
     }
 
     @Override
