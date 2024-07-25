@@ -16,7 +16,7 @@ public class DbServiceManagerImpl implements DBServiceManager {
 
     private final DataTemplate<Manager> managerDataTemplate;
     private final TransactionRunner transactionRunner;
-    private final HwCache<Long, Manager> cache = new MyCache<>();
+    private final HwCache<String, Manager> cache = new MyCache<>();
 
     public DbServiceManagerImpl(TransactionRunner transactionRunner, DataTemplate<Manager> managerDataTemplate) {
         this.transactionRunner = transactionRunner;
@@ -36,13 +36,13 @@ public class DbServiceManagerImpl implements DBServiceManager {
             log.info("updated manager: {}", manager);
             return manager;
         });
-        cache.put(savedManager.getNo(), savedManager);
+        cache.put(String.valueOf(savedManager.getNo()), savedManager);
         return savedManager;
     }
 
     @Override
     public Optional<Manager> getManager(long no) {
-        Manager manager = cache.get(no);
+        Manager manager = cache.get(String.valueOf(no));
         if (manager == null) {
             manager = transactionRunner.doInTransaction(connection -> {
                 var managerOptional = managerDataTemplate.findById(connection, no);
@@ -50,7 +50,7 @@ public class DbServiceManagerImpl implements DBServiceManager {
                 return managerOptional;
             }).orElse(null);
             if (manager != null) {
-                cache.put(no, manager);
+                cache.put(String.valueOf(no), manager);
             }
         }
         return Optional.ofNullable(manager);

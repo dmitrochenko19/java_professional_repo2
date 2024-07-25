@@ -16,7 +16,7 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     private final DataTemplate<Client> dataTemplate;
     private final TransactionRunner transactionRunner;
-    private final HwCache<Long, Client> cache = new MyCache<>();
+    private final HwCache<String, Client> cache = new MyCache<>();
 
     public DbServiceClientImpl(TransactionRunner transactionRunner, DataTemplate<Client> dataTemplate) {
         this.transactionRunner = transactionRunner;
@@ -36,13 +36,13 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("updated client: {}", client);
             return client;
         });
-        cache.put(savedClient.getId(), savedClient);
+        cache.put(String.valueOf(savedClient.getId()), savedClient);
         return savedClient;
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        Client client = cache.get(id);
+        Client client = cache.get(String.valueOf(id));
         if (client == null) {
             client = transactionRunner.doInTransaction(connection -> {
                 var clientOptional = dataTemplate.findById(connection, id);
@@ -50,7 +50,7 @@ public class DbServiceClientImpl implements DBServiceClient {
                 return clientOptional;
             }).orElse(null);
             if (client != null) {
-                cache.put(client.getId(), client);
+                cache.put(String.valueOf(client.getId()), client);
             }
         }
         return Optional.ofNullable(client);
