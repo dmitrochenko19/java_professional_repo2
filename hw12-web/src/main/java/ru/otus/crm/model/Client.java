@@ -2,6 +2,7 @@ package ru.otus.crm.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +27,8 @@ public class Client implements Cloneable {
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Address address;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Phone> phones;
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<Phone> phones = new ArrayList<>();
 
     public Client(String name) {
         this.id = null;
@@ -55,8 +56,10 @@ public class Client implements Cloneable {
         try {
             client.phones = getClonedPhones();
             client.phones.forEach(phone -> phone.setClient(client));
-            client.address = this.address.clone();
-            client.address.setClient(client);
+            if (this.address != null) {
+                client.address = this.address.clone();
+                client.address.setClient(client);
+            }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }

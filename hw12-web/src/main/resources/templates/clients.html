@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Клиенты</title>
+  <meta charset="utf-8">
+</head>
+
+<body>
+<h3>Список клиентов</h3>
+<table style="width: 1000px">
+  <thead>
+  <tr>
+    <td style="width: 100px">Id</td>
+    <td style="width: 300px">Имя</td>
+    <td style="width: 300px">Адрес</td>
+    <td style="width: 300px">Телефон</td>
+  </tr>
+  </thead>
+  <tbody>
+  <#if clients?has_content>
+  <#list clients as client>
+  <tr>
+    <td>${client.id}</td>
+    <td>${client.name}</td>
+    <td>${client.address}</td>
+    <td>
+      <#list client.phones as phone>
+      <p>${phone}</p>
+    </#list>
+    </td>
+  </tr>
+  </#list>
+</#if>
+</tbody>
+</table>
+
+<h3>Создать клиента</h3>
+<form action="/clients" method="post">
+  <table>
+    <tr>
+      <td>Имя</td>
+      <td><input  type="text" name="name"/></td>
+    </tr>
+    <tr>
+      <td>Адрес</td>
+      <td><input type="text" name="address"/></td>
+    </tr>
+    <tr>
+      <td>Телефон:</td>
+      <td><input type="text" name="phone"/></td>
+    </tr>
+  </table>
+  <input type="submit" value="Создать">
+</form>
+
+</body>
+</html>

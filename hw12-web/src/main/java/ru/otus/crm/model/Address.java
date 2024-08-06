@@ -32,7 +32,11 @@ public class Address implements Cloneable {
 
     @Override
     protected Address clone() throws CloneNotSupportedException {
-        Address address = new Address(this.id, this.street);
-        return address;
+        return new Address(this.id, this.street);
+    }
+
+    @Override
+    public String toString() {
+        return this.street;
     }
 }

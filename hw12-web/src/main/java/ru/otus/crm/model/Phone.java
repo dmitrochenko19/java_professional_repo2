@@ -29,7 +29,11 @@ public class Phone implements Cloneable {
 
     @Override
     protected Phone clone() throws CloneNotSupportedException {
-        Phone phone =  new Phone(this.id, this.number);
-        return phone;
+        return new Phone(this.id, this.number);
+    }
+
+    @Override
+    public String toString() {
+        return this.number;
     }
 }
