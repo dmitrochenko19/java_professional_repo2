@@ -25,10 +25,10 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
         Object configClassInstance = createInstanceWithDefaultConstructor(configClass);
         for (Method method : sortedMethods) {
+            checkDuplicateKey(method);
+
             Object[] args = getArgsForMethod(method);
             Object componentInstance = invokeMethodForCreatingBean(method, configClassInstance, args);
-
-            checkDuplicateKey(method);
 
             appComponents.add(componentInstance);
             appComponentsByName.put(method.getAnnotation(AppComponent.class).name(), componentInstance);
@@ -83,7 +83,8 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         Object[] args = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             args[i] = appComponents.stream()
-                    .filter(parameters[i]::isInstance).findFirst().orElse(null);
+                    .filter(parameters[i]::isInstance).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Unable to find component"));
         }
         return args;
     }
