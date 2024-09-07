@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Клиенты</title>
+  <meta charset="utf-8">
+</head>
+
+<body>
+<h3>Список клиентов</h3>
+<table style="width: 1000px" class="clients">
+  <tbody>
+  <tr>
+    <td style="width: 100px">Id</td>
+    <td style="width: 300px">Имя</td>
+    <td style="width: 300px">Адрес</td>
+    <td style="width: 300px">Телефон</td>
+  </tr>
+  <tr th:each="c : ${clients}">
+    <td th:text="${c.id}" ></td>
+    <td th:text="${c.name}" ></td>
+    <td th:text="${c.address}"></td>
+    <td>
+                <span th:each="p : ${c.phones}">
+                    <div th:text="${p.number}"></div>
+                </span>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h3>Создать клиента</h3>
+<form th:action="@{/clients}" th:object="${client}" th:method="post">
+  <table class="client">
+    <tr>
+      <td>Имя</td>
+      <td><input type="text" name="name" th:field="*{name}"/></td>
+    </tr>
+    <tr>
+      <td>Адрес</td>
+      <td><input type="text" name="address" th:field="*{address}"/></td>
+    </tr>
+    <tr>
+      <td>Телефон</td>
+      <td><input type="text" name="phone" th:field="*{phones}"/></td>
+    </tr>
+  </table>
+  <input type="submit" th:value="'Создать'">
+</form>
+
+</body>
+</html>
