@@ -40,6 +40,10 @@ const disconnect = () => {
 const sendMsg = () => {
     const roomId = document.getElementById(roomIdElementId).value;
     const message = document.getElementById(messageElementId).value;
+    if (roomId.trim() === '1408'){
+        alert('В этой комнате нельзя отправлять сообщения.')
+        return true;
+    }
     stompClient.send(`/app/message.${roomId}`, {}, JSON.stringify({'messageStr': message}))
 }
 
