@@ -65,6 +65,17 @@ allprojects {
             dependency("org.springframework.boot:spring-boot-starter-data-jdbc:3.2.5")
             dependency("org.springframework.boot:spring-boot-starter-web:3.2.5")
             dependency("org.springframework.boot:spring-boot-starter-thymeleaf:3.2.5")
+
+
+            dependency("org.webjars:sockjs-client:1.5.1")
+            dependency("org.webjars:stomp-websocket:2.3.4")
+            dependency("org.webjars:bootstrap:5.2.3")
+            dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+            dependency("com.google.code.findbugs:jsr305:3.0.2")
+            dependency("io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE")
+            dependency("org.springframework.data:spring-data-commons:3.1.5")
+            dependency("org.springframework.data:spring-data-relational:3.1.5")
+            dependency("org.springframework.data:spring-data-r2dbc:3.1.5")
         }
     }
 
