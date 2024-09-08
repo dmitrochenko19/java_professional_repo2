@@ -32,3 +32,8 @@ include("hw13-dependencyInjection")
 include("hw12-web")
 include("hw15-executors")
 include("hw14-springDataJDBC")
+include("hw18-webflux")
+include("hw18-webflux:client-service")
+findProject(":hw18-webflux:client-service")?.name = "client-service"
+include("hw18-webflux:datastore-service")
+findProject(":hw18-webflux:datastore-service")?.name = "datastore-service"
