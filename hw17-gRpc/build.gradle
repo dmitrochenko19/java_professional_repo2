@@ -1,0 +1,81 @@
+import com.google.protobuf.gradle.*
+import org.gradle.kotlin.dsl.proto
+
+plugins {
+    id("idea")
+    id("com.google.protobuf")
+}
+
+dependencies {
+    implementation("io.grpc:grpc-netty")
+    implementation("io.grpc:grpc-protobuf")
+    implementation("io.grpc:grpc-stub")
+    implementation("com.google.protobuf:protobuf-java")
+    implementation("com.google.errorprone:error_prone_annotations:2.11.0")
+
+    implementation("org.apache.tomcat:annotations-api:6.0.53")
+    implementation ("ch.qos.logback:logback-core:1.4.12")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
+}
+
+
+var protoSrcDir = "$projectDir/build/generated"
+
+idea {
+    module {
+        sourceDirs = sourceDirs.plus(file(protoSrcDir))
+    }
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir(protoSrcDir)
+        }
+    }
+}
+
+protobuf {
+    generatedFilesBaseDir = protoSrcDir
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.19.4"
+    }
+
+    generateProtoTasks {
+        ofSourceSet("main")
+    }
+}
+
+afterEvaluate {
+    tasks {
+        getByName("generateProto").dependsOn(processResources)
+    }
+}
+
+protobuf {
+    generatedFilesBaseDir = protoSrcDir
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.19.4"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.56.1"
+        }
+    }
+
+    generateProtoTasks {
+        ofSourceSet("main").forEach {
+            it.plugins {
+                id("grpc")
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    tasks {
+        getByName("generateProto").dependsOn(processResources)
+    }
+}

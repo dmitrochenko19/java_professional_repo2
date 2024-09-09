@@ -65,6 +65,9 @@ allprojects {
             dependency("org.springframework.boot:spring-boot-starter-data-jdbc:3.2.5")
             dependency("org.springframework.boot:spring-boot-starter-web:3.2.5")
             dependency("org.springframework.boot:spring-boot-starter-thymeleaf:3.2.5")
+            dependency("io.grpc:grpc-netty:1.64.0")
+            dependency("io.grpc:grpc-protobuf:1.64.0")
+            dependency("io.grpc:grpc-stub:1.64.0")
         }
     }
 
